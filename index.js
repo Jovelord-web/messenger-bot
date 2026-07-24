@@ -5,7 +5,7 @@ const axios = require('axios');
 const app = express().use(bodyParser.json());
 
 const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
-const VERIFY_TOKEN = process.env.VERIFY_TOKEN;
+const VERIFY_TOKEN = process.env.VERIFY_TOKEN || 'mojot_tajn_token_123';
 
 // Верификација на Webhook со Facebook
 app.get('/webhook', (req, res) => {
