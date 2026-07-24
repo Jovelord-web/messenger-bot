@@ -4,7 +4,7 @@ const axios = require('axios');
 
 const app = express().use(bodyParser.json());
 
-const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
+const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN || 'EAATPJv8odAoBSIxHwnkgGL6kgUnMgAjmXtX3TyZAZCZAl5A3FVX80tzxp6croT0ZBq1AKJbZAWHGQA8Et0UI2raSTrccCYrIkFLCZCKXWkOnfInThcFLOn2AuqbKM873mrLwVMZBEp0ZCbZBVfmYkBLt8kigx6LRlCrtKkZChoYt9StpS0GucCRdktp0sakhndtQRrb22ylZAZANfQZDZD';
 const VERIFY_TOKEN = process.env.VERIFY_TOKEN || 'mojot_tajn_token_123';
 
 // Верификација на Webhook со Facebook
