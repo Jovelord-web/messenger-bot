@@ -49,14 +49,36 @@ function handleMessage(sender_psid, received_message) {
     let response;
 
     if (received_message.text) {
-        response = {
-            "text": `Ти рече: "${received_message.text}". Јас сум минонот на Јован! 🤖`
+        let text = received_message.text.toLowerCase();
+
+        // 1. Ако му кажеш "здраво"
+        if (text.includes("здраво")) {
+            response = {
+                "text": "Здраво! 👋 Како сум денес? Напиши ми 'прати ми слика од научна фантастика' за да ти пратамнешто сочно! 🚀"
+            };
+        } 
+        // 2. Ако побараш слика од научна фантастика
+        else if (text.includes("научна фантастика") || text.includes("прати ми слика")) {
+            response = {
+                "attachment": {
+                    "type": "image",
+                    "payload": {
+                        "url": "https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?q=80&w=600",
+                        "is_reusable": true
+                    }
+                }
+            };
+        } 
+        // 3. За сè останато
+        else {
+            response = {
+                "text": "Не те разбрав точно. Пиши ми 'здраво' или 'прати ми слика од научна фантастика'! 🤖"
+            };
         }
     }
 
     callSendAPI(sender_psid, response);
 }
-
 // Пратка на одговорот назад до Messenger
 function callSendAPI(sender_psid, response) {
     let request_body = {
