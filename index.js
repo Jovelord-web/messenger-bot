@@ -56,36 +56,34 @@ async function handleMessage(sender_psid, received_message) {
                 "text": "Здраво! 👋 Јас сум твојот Vel'koz создавач! Пиши ми 'генерирај: [твојот опис за Vel\'koz]' и ќе ја направам сликата за тебе! 🚀"
             };
         } 
-        else if (text.startsWith("генерирај:") || text.startsWith("генерирај ")) {
-            // Ги земаме само зборовите по "генерирај:"
+       else if (text.startsWith("генерирај:") || text.startsWith("генерирај ")) {
             let prompt_macedonian = text.split(":")[1] || text.split("генерирај")[1];
             prompt_macedonian = prompt_macedonian.trim();
 
-            response = { "text": `Секако! Ги користам моите AI моќи за да создадам слика од Великиот Око: '${prompt_macedonian}'! Ве молам почекајте малку... ⌛` };
-            callSendAPI(sender_psid, response); // Праќаме порака за потврда
+            // 1. Веднаш му праќаме порака на корисникот дека AI-то работи
+            callSendAPI(sender_psid, { "text": `🎨 Ја цртам сликата за: '${prompt_macedonian}'... Почекај околу 10 секунди! ⌛` });
 
-            // Го преведуваме описот на англиски (многу едноставен превод за демо, ти ќе мора да додадеш подобар)
+            // 2. Превод на основни зборови
             let prompt_english = prompt_macedonian
                 .replace("велкоз", "Vel'koz")
                 .replace("на плажа", "on the beach")
                 .replace("како", "like")
-                .replace("инженерот", "the engineer")
-                .replace("на марс", "on Mars")
-                .replace("скин", "skin")
-                .replace("спарк-панк", "spark-punk");
-            
-            // Ако не го преведовме целосно, барем да има 'Vel'koz' во описот
-            if (!prompt_english.includes("Vel'koz")) {
+                .replace("на марс", "on Mars");
+
+            if (!prompt_english.toLowerCase().includes("vel'koz") && !prompt_english.toLowerCase().includes("velkoz")) {
                 prompt_english = "Vel'koz " + prompt_english;
             }
 
             try {
-                // Генерираме слика користејќи бесплатен API сервис (ова е демо и може да не работи секогаш)
-                // За да работи ова демо, користиме бесплатен модел кој генерира само стилизирани слики
-                // Во вистинска апликација, треба да користиш платен API (OpenAI/DALL-E) и да ставиш свој клуч.
-                
-               let imageUrl = `https://pollinations.ai/p/${encodeURIComponent(prompt_english)}?width=512&height=512&nologo=true`;
+                // Правиме уникатен линк за секоја слика
+                let randomSeed = Math.floor(Math.random() * 1000000);
+                let imageUrl = `https://pollinations.ai/p/${encodeURIComponent(prompt_english)}?width=512&height=512&nologo=true&seed=${randomSeed}`;
 
+                // ВАЖНО: Прво го тераме нашиот бот да почека сликата да се нацрта во заднина,
+                // за да може Фејсбук потоа да ја повлече за 0.1 секунда!
+                await fetch(imageUrl);
+
+                // 3. Сега и ја праќаме готовата слика на Facebook
                 response = {
                     "attachment": {
                         "type": "image",
@@ -96,9 +94,9 @@ async function handleMessage(sender_psid, received_message) {
                     }
                 };
             } catch (error) {
-                response = { "text": "Не успеав да генерирам слика во моментов. Ве молам пробајте подоцна!" };
+                response = { "text": "Имаше грешка при генерирањето. Ве молам пробајте повторно!" };
             }
-        } 
+        }
         else {
             response = {
                 "text": "Не те разбрав точно. Пиши ми 'здраво' или 'генерирај: [твојот опис]'! 🤖"
