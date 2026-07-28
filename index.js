@@ -44,47 +44,64 @@ app.post('/webhook', (req, res) => {
     }
 });
 
-// Автоматски одговор
-function handleMessage(sender_psid, received_message) {
+// Автоматски одговор (асинхрона функција за генерирање слики)
+async function handleMessage(sender_psid, received_message) {
     let response;
 
     if (received_message.text) {
         let text = received_message.text.toLowerCase();
 
-        // 1. Ако му кажеш "здраво"
         if (text.includes("здраво")) {
             response = {
-                "text": "Здраво! 👋 Како си денес? Напиши ми 'прати ми слика од научна фантастика' за да ти пратам нешто интересно :>! 🚀"
+                "text": "Здраво! 👋 Јас сум твојот Vel'koz создавач! Пиши ми 'генерирај: [твојот опис за Vel\'koz]' и ќе ја направам сликата за тебе! 🚀"
             };
         } 
-        // 2. Ако побараш слика од научна фантастика
-       // Новиот код со динамична (рандом) слика
-        else if (text.includes("научна фантастика") || text.includes("прати ми слика")) {
-            // Листа со директни слики што Facebook ги прифаќа веднаш
-            let scifiImages = [
-                "https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?q=80&w=600",
-                "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=600",
-                "https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=600",
-                "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=600"
-            ];
+        else if (text.startsWith("генерирај:") || text.startsWith("генерирај ")) {
+            // Ги земаме само зборовите по "генерирај:"
+            let prompt_macedonian = text.split(":")[1] || text.split("генерирај")[1];
+            prompt_macedonian = prompt_macedonian.trim();
 
-            // Избира случајна слика од листата
-            let randomImage = scifiImages[Math.floor(Math.random() * scifiImages.length)];
+            response = { "text": `Секако! Ги користам моите AI моќи за да создадам слика од Великиот Око: '${prompt_macedonian}'! Ве молам почекајте малку... ⌛` };
+            callSendAPI(sender_psid, response); // Праќаме порака за потврда
 
-            response = {
-                "attachment": {
-                    "type": "image",
-                    "payload": {
-                        "url": randomImage,
-                        "is_reusable": false
+            // Го преведуваме описот на англиски (многу едноставен превод за демо, ти ќе мора да додадеш подобар)
+            let prompt_english = prompt_macedonian
+                .replace("велкоз", "Vel'koz")
+                .replace("на плажа", "on the beach")
+                .replace("како", "like")
+                .replace("инженерот", "the engineer")
+                .replace("на марс", "on Mars")
+                .replace("скин", "skin")
+                .replace("спарк-панк", "spark-punk");
+            
+            // Ако не го преведовме целосно, барем да има 'Vel'koz' во описот
+            if (!prompt_english.includes("Vel'koz")) {
+                prompt_english = "Vel'koz " + prompt_english;
+            }
+
+            try {
+                // Генерираме слика користејќи бесплатен API сервис (ова е демо и може да не работи секогаш)
+                // За да работи ова демо, користиме бесплатен модел кој генерира само стилизирани слики
+                // Во вистинска апликација, треба да користиш платен API (OpenAI/DALL-E) и да ставиш свој клуч.
+                
+                let imageUrl = `https://pollinations.ai/p/${encodeURIComponent(prompt_english)}`;
+
+                response = {
+                    "attachment": {
+                        "type": "image",
+                        "payload": {
+                            "url": imageUrl,
+                            "is_reusable": false
+                        }
                     }
-                }
-            };
-        }
-        // 3. За сè останато
+                };
+            } catch (error) {
+                response = { "text": "Не успеав да генерирам слика во моментов. Ве молам пробајте подоцна!" };
+            }
+        } 
         else {
             response = {
-                "text": "Не те разбрав точно. Пиши ми 'здраво' или 'прати ми слика од научна фантастика'! 🤖"
+                "text": "Не те разбрав точно. Пиши ми 'здраво' или 'генерирај: [твојот опис]'! 🤖"
             };
         }
     }
