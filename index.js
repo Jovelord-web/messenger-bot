@@ -60,12 +60,12 @@ async function handleMessage(sender_psid, received_message) {
             let prompt_macedonian = text.split(":")[1] || text.split("генерирај")[1];
             prompt_macedonian = prompt_macedonian.trim();
 
-            // 1. Веднаш праќаме порака за потврда
-            callSendAPI(sender_psid, { "text": `🎨 Ја цртам сликата за: '${prompt_macedonian}'... Почекај 5-10 секунди! ⌛` });
+            // 1. Праќаме инстант порака дека AI-то почнува да црта
+            callSendAPI(sender_psid, { "text": `🎨 Ја цртам сликата за: '${prompt_macedonian}'... Почекај неколку секунди! ⌛` });
 
-            // 2. Ги отстрануваме апострофите и специјалните карактери што го кочат Facebook
+            // 2. Чистење на текстот
             let cleanPrompt = prompt_macedonian
-                .replace(/'/g, "") // Го вади ' од Vel'koz
+                .replace(/'/g, "")
                 .replace("велкоз", "Velkoz")
                 .replace("на плажа", "on the beach")
                 .replace("како", "like")
@@ -78,10 +78,10 @@ async function handleMessage(sender_psid, received_message) {
             try {
                 let randomSeed = Math.floor(Math.random() * 1000000);
                 
-                // ВАЖНО: Додадено е .jpg на крајот за Facebook веднаш да ја препознае како слика
-                let imageUrl = `https://pollinations.ai/p/${encodeURIComponent(cleanPrompt)}.jpg?width=512&height=512&nologo=true&seed=${randomSeed}`;
+                // ДИРЕКТЕН ЛИНК ДО JPG СЛИКА (користи image.pollinations.ai)
+                let imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(cleanPrompt)}?width=512&height=512&nologo=true&seed=${randomSeed}`;
 
-                // Го чекаме генераторот да заврши во заднина
+                // Серверот прво ја генерира сликата во заднина
                 await fetch(imageUrl);
 
                 // И ја праќаме сликата на Messenger
