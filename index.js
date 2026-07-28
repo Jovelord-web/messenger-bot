@@ -84,7 +84,7 @@ async function handleMessage(sender_psid, received_message) {
                 // За да работи ова демо, користиме бесплатен модел кој генерира само стилизирани слики
                 // Во вистинска апликација, треба да користиш платен API (OpenAI/DALL-E) и да ставиш свој клуч.
                 
-                let imageUrl = `https://pollinations.ai/p/${encodeURIComponent(prompt_english)}`;
+               let imageUrl = `https://pollinations.ai/p/${encodeURIComponent(prompt_english)}?width=512&height=512&nologo=true`;
 
                 response = {
                     "attachment": {
