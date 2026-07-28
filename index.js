@@ -54,21 +54,29 @@ function handleMessage(sender_psid, received_message) {
         // 1. Ако му кажеш "здраво"
         if (text.includes("здраво")) {
             response = {
-                "text": "Здраво! 👋 Како сум денес? Напиши ми 'прати ми слика од научна фантастика' за да ти пратамнешто сочно! 🚀"
+                "text": "Здраво! 👋 Како си денес? Напиши ми 'прати ми слика од научна фантастика' за да ти пратам нешто интересно :>! 🚀"
             };
         } 
         // 2. Ако побараш слика од научна фантастика
        // Новиот код со динамична (рандом) слика
         else if (text.includes("научна фантастика") || text.includes("прати ми слика")) {
+            // Листа со директни слики што Facebook ги прифаќа веднаш
+            let scifiImages = [
+                "https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?q=80&w=600",
+                "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=600",
+                "https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=80&w=600",
+                "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=600"
+            ];
+
+            // Избира случајна слика од листата
+            let randomImage = scifiImages[Math.floor(Math.random() * scifiImages.length)];
+
             response = {
                 "attachment": {
                     "type": "image",
                     "payload": {
-                        // Овој линк влече рандом слика на тема sci-fi и space
-                        "url": "https://source.unsplash.com/featured/?scifi,space,future",
-                        // МНОГУ ВАЖНО: Тука мора да стои false!
-                        // Ако е true, Facebook ќе ја зачува првата слика и ќе ја праќа неа цело време.
-                        "is_reusable": false 
+                        "url": randomImage,
+                        "is_reusable": false
                     }
                 }
             };
