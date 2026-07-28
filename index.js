@@ -58,17 +58,21 @@ function handleMessage(sender_psid, received_message) {
             };
         } 
         // 2. Ако побараш слика од научна фантастика
+       // Новиот код со динамична (рандом) слика
         else if (text.includes("научна фантастика") || text.includes("прати ми слика")) {
             response = {
                 "attachment": {
                     "type": "image",
                     "payload": {
-                        "url": "https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?q=80&w=600",
-                        "is_reusable": true
+                        // Овој линк влече рандом слика на тема sci-fi и space
+                        "url": "https://source.unsplash.com/featured/?scifi,space,future",
+                        // МНОГУ ВАЖНО: Тука мора да стои false!
+                        // Ако е true, Facebook ќе ја зачува првата слика и ќе ја праќа неа цело време.
+                        "is_reusable": false 
                     }
                 }
             };
-        } 
+        }
         // 3. За сè останато
         else {
             response = {
