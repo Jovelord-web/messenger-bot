@@ -56,34 +56,35 @@ async function handleMessage(sender_psid, received_message) {
                 "text": "Здраво! 👋 Јас сум твојот Vel'koz создавач! Пиши ми 'генерирај: [твојот опис за Vel\'koz]' и ќе ја направам сликата за тебе! 🚀"
             };
         } 
-       else if (text.startsWith("генерирај:") || text.startsWith("генерирај ")) {
+      else if (text.startsWith("генерирај:") || text.startsWith("генерирај ")) {
             let prompt_macedonian = text.split(":")[1] || text.split("генерирај")[1];
             prompt_macedonian = prompt_macedonian.trim();
 
-            // 1. Веднаш му праќаме порака на корисникот дека AI-то работи
-            callSendAPI(sender_psid, { "text": `🎨 Ја цртам сликата за: '${prompt_macedonian}'... Почекај околу 10 секунди! ⌛` });
+            // 1. Веднаш праќаме порака за потврда
+            callSendAPI(sender_psid, { "text": `🎨 Ја цртам сликата за: '${prompt_macedonian}'... Почекај 5-10 секунди! ⌛` });
 
-            // 2. Превод на основни зборови
-            let prompt_english = prompt_macedonian
-                .replace("велкоз", "Vel'koz")
+            // 2. Ги отстрануваме апострофите и специјалните карактери што го кочат Facebook
+            let cleanPrompt = prompt_macedonian
+                .replace(/'/g, "") // Го вади ' од Vel'koz
+                .replace("велкоз", "Velkoz")
                 .replace("на плажа", "on the beach")
                 .replace("како", "like")
                 .replace("на марс", "on Mars");
 
-            if (!prompt_english.toLowerCase().includes("vel'koz") && !prompt_english.toLowerCase().includes("velkoz")) {
-                prompt_english = "Vel'koz " + prompt_english;
+            if (!cleanPrompt.toLowerCase().includes("velkoz")) {
+                cleanPrompt = "Velkoz " + cleanPrompt;
             }
 
             try {
-                // Правиме уникатен линк за секоја слика
                 let randomSeed = Math.floor(Math.random() * 1000000);
-                let imageUrl = `https://pollinations.ai/p/${encodeURIComponent(prompt_english)}?width=512&height=512&nologo=true&seed=${randomSeed}`;
+                
+                // ВАЖНО: Додадено е .jpg на крајот за Facebook веднаш да ја препознае како слика
+                let imageUrl = `https://pollinations.ai/p/${encodeURIComponent(cleanPrompt)}.jpg?width=512&height=512&nologo=true&seed=${randomSeed}`;
 
-                // ВАЖНО: Прво го тераме нашиот бот да почека сликата да се нацрта во заднина,
-                // за да може Фејсбук потоа да ја повлече за 0.1 секунда!
+                // Го чекаме генераторот да заврши во заднина
                 await fetch(imageUrl);
 
-                // 3. Сега и ја праќаме готовата слика на Facebook
+                // И ја праќаме сликата на Messenger
                 response = {
                     "attachment": {
                         "type": "image",
